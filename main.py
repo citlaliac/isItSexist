@@ -1,17 +1,40 @@
 import pandas as pd 
 from transformers import pipeline
 
+## Define classifier type
+classifier = pipeline("zero-shot-classification")
+
+## Variables
+allResults= []
 
 ## Import and read CSV
-df = pd.read_csv('songdata.csv') 
+df = pd.read_csv('songData.csv') 
+column_name = "lyrics"
 
-## Iterate through each row in CSV to run lyrics through transformer
+# TODO create as own more reusable method
+## Function to read and classify from CSV
+# For each lyrics in sheet classify the lyrics and add to results list
+for lyricsToClassify in df[column_name]:
+    # Use transformer to classify lyrics
+    # TODO consider better candidate labels
+    # TODO Keep taking this further; consider more tuning
+    results = classifier(lyricsToClassify, candidate_labels=["misogyny", "non-misogyny"])
+    allResults.append([lyricsToClassify, results])
+    print(results)
 
-## Use classifier and save reults into next row in CSV
-classifier = pipeline("zero-shot-classification")
-results = classifier("American woman, stay away from me American woman, mamma let me be Don't come hanging round my door I don't want to see your face no more I got more important things to do Than spend my time growing' old with you Now woman, stay away American woman, listen when I say American woman, get away from me American woman, mamma let me be Don't come knocking on my door I don't want to see your shadow no more Colored lights can hypnotize Sparkle someone else's eyes Now woman, get away American woman, listen when I say American woman, I said get away American woman, listen when I say Don't come hanging' round my door Don't want to see your face no more I don't need your warm machines I don't need your ghetto scenes Colored lights can hypnotize Sparkle someone else's eyes Now woman, get away American woman, listen when I say American woman, stay away from me American woman, mamma let me be I got to go, I got to get away Babe, I got to go I want to fly away I'm going to leave you woman I'm going to leave you woman I'm going to leave you woman I'm going to leave you woman Bye, bye Bye, bye Bye, bye Bye, bye American woman You're no good for me And I'm no good for you American woman I'm looking at you right in the eye Tell you what I'm going to do I'm going to leave you woman You know I got to go I'm going to leave you woman I got to go American woman I got to go I got to go American woman, yeah", candidate_labels=["misogyny", "non-misogyny"]),
 
-# Print results (for inital testing)
-print(results)
+# TODO create as own more reusable method
+## Save data to CSV
+# Save results of lyric classifcation to a data frame
+newDf = pd.DataFrame(allResults)
 
-## Output determinaitons into new cell in data sheet
+# Append existing data fram with dataframe containing classifications
+# TODO update headers of csv to not be 0, 1
+for col in df.columns:
+    if col != column_name:
+        newDf[col] = df[col]
+
+# Save dataframe containing all relevant classifications and metadata to CSV called 'determinations.csv' (in docker*)
+newDf.to_csv('output.csv', index=False)
+
+
