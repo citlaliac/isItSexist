@@ -2,4 +2,4 @@ The goal of this project is to look at popular music over the last few decased a
 
 My goal is to use AI and transformers to do this. 
 
-This is an updated version of an earlier project from college.
+This is an updated version of an earlier project from 2018.
