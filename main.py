@@ -1,40 +1,58 @@
-import pandas as pd 
+import pandas as pd
 from transformers import pipeline
 
-## Define classifier type
+# Load song data CSV into dataframe
+df = pd.read_csv('songData.csv')
+
+## Define classifier
 classifier = pipeline("zero-shot-classification")
 
-## Variables
-allResults= []
+# Create empty lists for storing results in columns
+result_labels = []
+result_scores = []
 
-## Import and read CSV
-df = pd.read_csv('songData.csv') 
-column_name = "lyrics"
+## Classify the lyrics and save the results
+# Iterate through each row in dataframe
+for index, row in df.iterrows():
+    try:
+        lyrics_to_classify = row['lyrics']
 
-# TODO create as own more reusable method
-## Function to read and classify from CSV
-# For each lyrics in sheet classify the lyrics and add to results list
-for lyricsToClassify in df[column_name]:
-    # Use transformer to classify lyrics
-    # TODO consider better candidate labels
-    # TODO Keep taking this further; consider more tuning
-    results = classifier(lyricsToClassify, candidate_labels=["misogyny", "non-misogyny"])
-    allResults.append([lyricsToClassify, results])
-    print(results)
+        # Classify the lyrics
+        # TODO consider better candidate labels
+        # TODO Keep taking this further; consider more tuning
+        raw_results = classifier(lyrics_to_classify, candidate_labels=["misogyny", "non-misogyny"])
 
+        # Extract labels and scores; append to results list to later save
+        labels = raw_results['labels'][0]
+        scores = raw_results['scores'][0]
 
-# TODO create as own more reusable method
-## Save data to CSV
-# Save results of lyric classifcation to a data frame
-newDf = pd.DataFrame(allResults)
-
-# Append existing data fram with dataframe containing classifications
-# TODO update headers of csv to not be 0, 1
-for col in df.columns:
-    if col != column_name:
-        newDf[col] = df[col]
-
-# Save dataframe containing all relevant classifications and metadata to CSV called 'determinations.csv' (in docker*)
-newDf.to_csv('output.csv', index=False)
+        # Append labels and scores to result lists
+        result_labels.append(labels)
+        result_scores.append(scores)
+        if index % 20 == 0:
+            print(index)
+    except Exception as e:
+        print(f"Error processing row {index}: {e} for classification")
+        # If an error occurs, add a placeholder value to the result lists
+        result_labels.append("error")
+        result_scores.append(-1)
 
 
+# Check lengths
+print("Length of result_labels:", len(result_labels))
+print("Length of result_scores:", len(result_scores))
+print("Length of result_scores:", result_scores[2])
+print("Length of DataFrame index:", len(df))
+result_df = pd.DataFrame(index=range(len(df)))
+
+
+## Create a CSV with the new classificaitons and metadata
+# Add new columns to dataframe
+
+# result_df['labels'] = result_labels
+# result_df['scores'] = result_scores
+df['labels'] = result_labels
+df['scores'] = result_scores
+
+# Save the updated DataFrame to a new CSV file
+df.to_csv('songClassification_results.csv', index=False)
