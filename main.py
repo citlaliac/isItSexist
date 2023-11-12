@@ -2,7 +2,7 @@ import pandas as pd
 from transformers import pipeline
 
 # Load song data CSV into dataframe
-df = pd.read_csv('songDataNew.csv')
+df = pd.read_csv('songData.csv')
 
 ## Define classifier
 classifier = pipeline("zero-shot-classification")
@@ -29,7 +29,7 @@ for index, row in df.iterrows():
         # Append labels and scores to result lists
         result_labels.append(labels)
         result_scores.append(scores)
-        if index % 100 == 0:
+        if index % 20 == 0:
             print(index)
     except Exception as e:
         print(f"Error processing row {index}: {e} for classification")

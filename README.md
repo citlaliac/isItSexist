@@ -4,7 +4,7 @@ The goal of this project is to look at popular music over the last few decased a
 
 My goal is to use AI and transformers to do this. 
 
-This is an updated version of an earlier project from 2018.
+This is an updated version of earlier projects from 2018: [misoBot](https://github.com/citlaliac/misoBot) and [Music Sentiment Analysis](https://github.com/citlaliac/SentimentAnalysisOfMusic)
 
 ## How to run it!
 1. Download the files locally
